@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: user-service
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:postgresql://${DB_HOST:10.0.68.204}:${DB_PORT:5432}/${DB_NAME:us_fwd_swat_acc}?currentSchema=${DB_SCHEMA:us_fwd}
+    username: ${DB_USERNAME:us_fwd_dev}
+    password: ${DB_PASSWORD:}

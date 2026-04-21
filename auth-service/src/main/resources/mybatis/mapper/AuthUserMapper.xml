@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.authservice.mapper.AuthUserMapper">
+
+    <select id="findCredentials" resultType="map">
+        SELECT usr_id   AS "usrId",
+               co_cd    AS "coCd",
+               usr_nm   AS "usrNm",
+               usr_pwd  AS "usrPwd",
+               act_flg  AS "actFlg",
+               full_nm  AS "fullNm"
+        FROM adm_usr
+        WHERE co_cd = #{coCd}
+          AND usr_id = #{usrId}
+          AND (delt_sts_flg != 'Y' OR delt_sts_flg IS NULL)
+    </select>
+</mapper>

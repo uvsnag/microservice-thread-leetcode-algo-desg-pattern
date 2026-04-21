@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.userservice.mapper.UserMapper">
+
+    <resultMap id="admUsrResultMap" type="com.example.userservice.model.AdmUsr">
+        <id column="usr_id" property="usrId"/>
+        <id column="co_cd" property="coCd"/>
+        <result column="usr_nm" property="usrNm"/>
+        <result column="usr_pwd" property="usrPwd"/>
+        <result column="com_usr_dt" property="comUsrDt"/>
+        <result column="com_usr_sx" property="comUsrSx"/>
+        <result column="co_tel_no" property="coTelNo"/>
+        <result column="hm_tel_no" property="hmTelNo"/>
+        <result column="mphn_no" property="mphnNo"/>
+        <result column="fax_no" property="faxNo"/>
+        <result column="usr_eml" property="usrEml"/>
+        <result column="act_flg" property="actFlg"/>
+        <result column="delt_sts_flg" property="deltStsFlg"/>
+        <result column="cre_usr_id" property="creUsrId"/>
+        <result column="cre_dt" property="creDt"/>
+        <result column="upd_usr_id" property="updUsrId"/>
+        <result column="upd_dt" property="updDt"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="age" property="age"/>
+        <result column="ntlt" property="ntlt"/>
+        <result column="mrr_sts_cd" property="mrrStsCd"/>
+        <result column="edu" property="edu"/>
+        <result column="hby" property="hby"/>
+        <result column="wrk_exp" property="wrkExp"/>
+        <result column="hm_addr" property="hmAddr"/>
+        <result column="spct" property="spct"/>
+        <result column="eng_lvl" property="engLvl"/>
+        <result column="saly_lvl" property="salyLvl"/>
+        <result column="prj_his" property="prjHis"/>
+        <result column="cnt_cd" property="cntCd"/>
+        <result column="cty_nm" property="ctyNm"/>
+        <result column="is_root" property="isRoot"/>
+        <result column="brdy_val" property="brdyVal"/>
+        <result column="ctrb_pnt_no" property="ctrbPntNo"/>
+        <result column="perf_pnt_no" property="perfPntNo"/>
+        <result column="lst_perf_pnt_no" property="lstPerfPntNo"/>
+        <result column="lst_ctrb_pnt_no" property="lstCtrbPntNo"/>
+        <result column="empe_no" property="empeNo"/>
+        <result column="empe_st_dt" property="empeStDt"/>
+        <result column="add_prbtn_vac_flg" property="addPrbtnVacFlg"/>
+        <result column="loc_cd" property="locCd"/>
+        <result column="empe_tp_cd" property="empeTpCd"/>
+        <result column="full_nm" property="fullNm"/>
+        <result column="usr_pwd_temp" property="usrPwdTemp"/>
+        <result column="dvc_tkn_cd" property="dvcTknCd"/>
+        <result column="face_usr_id" property="faceUsrId"/>
+        <result column="sky_id" property="skyId"/>
+        <result column="ofc_cd" property="ofcCd"/>
+        <result column="empe_end_dt" property="empeEndDt"/>
+        <result column="sns_id" property="snsId"/>
+        <result column="sns_nm" property="snsNm"/>
+        <result column="cty_cd" property="ctyCd"/>
+        <result column="usr_eml_pwd" property="usrEmlPwd"/>
+        <result column="eml_ctnt" property="emlCtnt"/>
+        <result column="eml_tkn_val" property="emlTknVal"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="admUsrResultMap">
+        SELECT * FROM adm_usr WHERE delt_sts_flg != 'Y' OR delt_sts_flg IS NULL
+        ORDER BY upd_dt DESC
+    </select>
+
+    <select id="findByCompositeKey" resultMap="admUsrResultMap">
+        SELECT * FROM adm_usr
+        WHERE co_cd = #{coCd} AND usr_id = #{usrId}
+    </select>
+
+    <select id="findByCoCd" resultMap="admUsrResultMap">
+        SELECT * FROM adm_usr
+        WHERE co_cd = #{coCd} AND (delt_sts_flg != 'Y' OR delt_sts_flg IS NULL)
+        ORDER BY usr_nm
+    </select>
+
+    <select id="searchByKeyword" resultMap="admUsrResultMap">
+        SELECT * FROM adm_usr
+        WHERE (delt_sts_flg != 'Y' OR delt_sts_flg IS NULL)
+          AND (
+            LOWER(usr_nm) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            OR LOWER(full_nm) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            OR LOWER(usr_eml) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+            OR LOWER(usr_id) LIKE LOWER(CONCAT('%', #{keyword}, '%'))
+          )
+        ORDER BY usr_nm
+    </select>
+
+    <select id="findByAge" resultMap="admUsrResultMap">
+        SELECT * FROM adm_usr
+        WHERE age = #{age} AND (delt_sts_flg != 'Y' OR delt_sts_flg IS NULL)
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM adm_usr WHERE delt_sts_flg != 'Y' OR delt_sts_flg IS NULL
+    </select>
+</mapper>

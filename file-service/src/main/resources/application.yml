@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: file-service
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+server:
+  port: ${SERVER_PORT:8083}
+
+app:
+  storage:
+    bucket: ${APP_STORAGE_BUCKET:demo-bucket}
+  aws:
+    region: ${APP_AWS_REGION:us-east-1}
+    access-key-id: ${APP_AWS_ACCESS_KEY_ID:}
+    secret-access-key: ${APP_AWS_SECRET_ACCESS_KEY:}
+    endpoint: ${APP_AWS_ENDPOINT:}
+  rabbitmq:
+    file-activity-exchange: ${APP_RABBITMQ_FILE_ACTIVITY_EXCHANGE:file.activity.exchange}
+    file-activity-queue: ${APP_RABBITMQ_FILE_ACTIVITY_QUEUE:file.activity.cache.queue}
+    file-activity-routing-key: ${APP_RABBITMQ_FILE_ACTIVITY_ROUTING_KEY:file.activity.cache}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

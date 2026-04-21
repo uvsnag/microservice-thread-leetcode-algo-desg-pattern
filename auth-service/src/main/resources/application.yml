@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/demoaws?currentSchema=us_fwd}
+    username: ${SPRING_DATASOURCE_USERNAME:demo}
+    password: ${SPRING_DATASOURCE_PASSWORD:demo}
+  kafka:
+    bootstrap-servers: ${APP_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: ${SERVER_PORT:8084}
+
+app:
+  jwt:
+    # Base64-encoded 512-bit key. Override via APP_JWT_SECRET env variable in production.
+    secret: ${APP_JWT_SECRET:dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IGZvciBkZW1vIHB1cnBvc2VzIG9ubHkgLSBjaGFuZ2UgaXQgaW4gcHJvZHVjdGlvbiAtIG1pbiA1MTIgYml0cw==}
+    access-token-expiration-ms: ${APP_JWT_ACCESS_EXPIRATION:3600000}
+    refresh-token-expiration-ms: ${APP_JWT_REFRESH_EXPIRATION:86400000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  kafka:
+    auth-topic: ${APP_KAFKA_AUTH_TOPIC:auth.events}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

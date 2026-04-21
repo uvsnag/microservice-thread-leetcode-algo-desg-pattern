@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+  cloud:
+    gateway:
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestedTokens: 1
+            key-resolver: "#{@userKeyResolver}"
+        - name: CircuitBreaker
+          args:
+            name: defaultCircuitBreaker
+            fallbackUri: forward:/fallback
+        - AddRequestHeader=X-Request-Id, ${random.uuid}
+      routes:
+        - id: auth-service
+          uri: ${services.auth-service-url:http://localhost:8084}
+          predicates:
+            - Path=/auth,/auth/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+        - id: user-service
+          uri: ${services.user-service-url:http://localhost:8081}
+          predicates:
+            - Path=/users,/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback
+        - id: cache-service
+          uri: ${services.cache-service-url:http://localhost:8082}
+          predicates:
+            - Path=/cache,/cache/**
+        - id: file-service
+          uri: ${services.file-service-url:http://localhost:8083}
+          predicates:
+            - Path=/files,/files/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: fileServiceCB
+                fallbackUri: forward:/fallback
+        - id: notification-service
+          uri: ${services.notification-service-url:http://localhost:8085}
+          predicates:
+            - Path=/notifications,/notifications/**
+        - id: learning-service
+          uri: ${services.learning-service-url:http://localhost:8086}
+          predicates:
+            - Path=/api/learning,/api/learning/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IGZvciBkZW1vIHB1cnBvc2VzIG9ubHkgLSBjaGFuZ2UgaXQgaW4gcHJvZHVjdGlvbiAtIG1pbiA1MTIgYml0cw==}
+    open-paths: /auth/**,/actuator/**,/**/swagger-ui/**,/**/v3/api-docs/**,/fallback,/api/learning/**
+
+# Resilience4j Circuit Breaker configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+    instances:
+      defaultCircuitBreaker:
+        baseConfig: default
+      userServiceCB:
+        baseConfig: default
+        failureRateThreshold: 60
+      fileServiceCB:
+        baseConfig: default
+        waitDurationInOpenState: 15000
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,ratelimiters
+  health:
+    circuitbreakers:
+      enabled: true
